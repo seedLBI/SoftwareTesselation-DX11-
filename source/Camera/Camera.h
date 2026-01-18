@@ -21,6 +21,7 @@ public:
 
 	XMMATRIX getMatrixView();
 	float& GetFOV();
+	XMVECTOR& GetPos();
 
 private:
 	LerpedValue_float3 Pos, Front, Up;

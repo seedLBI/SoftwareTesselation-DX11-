@@ -1,6 +1,7 @@
 cbuffer MatrixView : register(b0)
 {
     float4x4 WorldViewProj;
+    float3   PosView;
 }
 
 cbuffer Indexes : register(b1)
@@ -15,12 +16,18 @@ cbuffer Time : register(b2)
     float time;
 }
 
+cbuffer LightDirectional : register(b3)
+{
+    float4 light_dir;
+    float4 light_color;
+}
 
 struct VSOutput
 {
     float4 posH : SV_Position;
     float2 uv : TEXCOORD0;
     float3 normal : NORMAL0;
+    float3 posWS : TEXCOORD1;
 };
 
 
@@ -28,7 +35,6 @@ float hash(float n)
 {
     return frac(sin(n) * 43758.5453123);
 }
-
 float4 randomColor(uint id)
 {
     return float4(hash(float(id + 0)), hash(float(id + 1)), hash(float(id + 2)), 1.f);
@@ -54,9 +60,9 @@ PointNormal uv_to_circle(float u, float v)
     float r = 1.f;
     float PI = 3.14159265359;
     
-    float x = v * cos(2.f * PI * u);
+    float x = sqrt(v) * cos(2.f * PI * u);
     float y = 0.f;
-    float z = v * sin(2.f * PI * u);
+    float z = sqrt(v) * sin(2.f * PI * u);
     
     PointNormal pn;
     pn.pos = float3(x, y, z);
@@ -164,8 +170,6 @@ PointNormal uv_to_torus_knot(float u, float v)
     return pn;
 }
 
-
-
 PointNormal lerp(PointNormal a, PointNormal b, float s)
 {
     PointNormal pn;
@@ -173,7 +177,6 @@ PointNormal lerp(PointNormal a, PointNormal b, float s)
     pn.normal = lerp(a.normal, b.normal, s);
     return pn;
 }
-
 PointNormal pickPN(float u, float v, int i)
 {
     if (i == 0)
@@ -185,6 +188,8 @@ PointNormal pickPN(float u, float v, int i)
     
     return uv_to_torus(u,v);
 }
+
+
 
 VSOutput VSMain(uint vid : SV_VertexID)
 {
@@ -198,7 +203,7 @@ VSOutput VSMain(uint vid : SV_VertexID)
     float u = x / float(N - 1);
     float v = y / float(N - 1); 
     
-    float timee = time * 0.25;
+    float timee = time * 0.125 * 0.8;
     float phase = frac(timee);
 
     const int NN = 4;
@@ -213,7 +218,7 @@ VSOutput VSMain(uint vid : SV_VertexID)
 
     PointNormal outt = lerp(a, b, s);
     
-    
+    O.posWS = outt.pos;
     O.posH = mul(float4(outt.pos, 1), WorldViewProj);
     O.uv = float2(u,v);
     O.normal = outt.normal;
@@ -221,16 +226,42 @@ VSOutput VSMain(uint vid : SV_VertexID)
     return O;
 }
 
+
+
 float4 PSMain(VSOutput IN, uint pid : SV_PrimitiveId) : SV_Target
 {
     
     uint2 coords = (uint2) (IN.uv * 256.0);
     uint val1 = coords.x ^ coords.y;
-    
     float xor_pattern = float(val1 % 256) / 255.f;
-
-    float4 xor_color = float4(1.f - xor_pattern, xor_pattern, float(val1 % 128) / 127.f, 1.f);
+    float3 xor_color = float3(1.f - xor_pattern, xor_pattern, float(val1 % 128) / 127.f);
     
-
-    return lerp(xor_color, float4(IN.normal, 1.f), 0.5f);
+    
+    
+    float3 koef_diffuse = xor_color;
+    float3 normal  = IN.normal;
+    
+    float koef_ambient = 0.15f;
+    float koef_specular = 0.5f;
+    float shininess = 64.f;
+    
+    float3 N = normalize(IN.normal);
+    float3 L = normalize(light_dir.xyz);
+    float3 V = normalize(PosView - IN.posWS);
+    
+    float NdotL = saturate(dot(N, L));
+    
+    float3 ambient = koef_ambient * koef_diffuse;
+    float3 diffuse = koef_diffuse * (light_color.xyz * NdotL);
+    
+    float3 R = reflect(-L, N);
+    float specFactor = pow(max(dot(R, V), 0.0f), shininess);
+    float3 specular = koef_specular * light_color.xyz * specFactor;
+    
+    float3 finalColor = ambient + diffuse + specular;
+    finalColor = saturate(finalColor);
+    
+    return float4(finalColor, 1.f);
+    
+    //return lerp(xor_color, float4(IN.normal, 1.f), 0.5f);
 }

@@ -12,9 +12,13 @@ Application::Application(HINSTANCE hInstance, int nCmdShow) {
 	shader.CreateConstantBuffer("MatrixView", 0, sizeof(cbuffer_MatrixView));
 	shader.CreateConstantBuffer("Indexes", 1, sizeof(cbuffer_Indexes));
 	shader.CreateConstantBuffer("Time", 2, sizeof(cbuffer_Time));
+	shader.CreateConstantBuffer("LightDirectional", 3, sizeof(cbuffer_LightDirectional));
 	shader.BindConstantBufferToVS("MatrixView");
 	shader.BindConstantBufferToVS("Indexes");
 	shader.BindConstantBufferToVS("Time");
+
+	shader.BindConstantBufferToPS("MatrixView");
+	shader.BindConstantBufferToPS("LightDirectional");
 
 
 	current_Subdivision = 24;
@@ -63,10 +67,35 @@ void Application::Frame() {
 
 
 	XMStoreFloat4x4(&MVP.wvp, XMMatrixTranspose(VP));
+	XMStoreFloat3(&MVP.posView, camera.GetPos());
+
 	shader.UpdateConstantBuffer("MatrixView", &MVP, sizeof(MVP));
 	
 	TIME.time = framework::time::GetTimeProgram();
 	shader.UpdateConstantBuffer("Time", &TIME, sizeof(TIME));
+	
+
+
+	float time = framework::time::GetTimeProgram();
+
+	float azimuthSpeed = 2.5f;
+	float elevationSpeed = 2.3f;
+
+	float azimuth = time * azimuthSpeed;
+	float elevation = sin(time * elevationSpeed) * 0.5f;
+
+	LIGHT.dir = {
+		cos(elevation) * cos(azimuth),
+		sin(elevation),
+		cos(elevation) * sin(azimuth),
+		0.f
+	};
+	LIGHT.color = { 1.f,1.f,1.f,0.f };
+	
+	shader.UpdateConstantBuffer("LightDirectional", &LIGHT, sizeof(LIGHT));
+
+
+
 
 
 

@@ -25,6 +25,7 @@ private:
 
 	struct cbuffer_MatrixView { 
 		XMFLOAT4X4 wvp;
+		XMFLOAT3 posView;
 	} MVP;
 
 	struct cbuffer_Indexes {
@@ -35,6 +36,11 @@ private:
 	struct cbuffer_Time {
 		float time;
 	} TIME;
+
+	struct cbuffer_LightDirectional {
+		XMFLOAT4 dir;
+		XMFLOAT4 color;
+	} LIGHT;
 
 
 	size_t current_Subdivision = 2;

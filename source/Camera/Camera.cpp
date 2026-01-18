@@ -34,6 +34,11 @@ XMMATRIX Camera::getMatrixView() {
 float& Camera::GetFOV() {
 	return fov.GetLerped();
 }
+XMVECTOR& Camera::GetPos() {
+	return Pos.GetLerped();
+}
+
+
 void Camera::UpdateMovement() {
 	float cameraSpeed = 0.8f * framework::time::GetDeltaTime();
 
