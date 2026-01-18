@@ -60,9 +60,6 @@
     <ClCompile Include="source\Application\Application.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="source\SoftwareTesselation\SoftwareTesselation.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="source\LerpedValue\LerpedValue.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
@@ -93,9 +90,6 @@
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="source\Application\Application.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="source\SoftwareTesselation\SoftwareTesselation.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="source\Camera\Camera.h">

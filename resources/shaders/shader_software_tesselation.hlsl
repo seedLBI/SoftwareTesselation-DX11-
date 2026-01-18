@@ -6,7 +6,7 @@ cbuffer MatrixView : register(b0)
 
 cbuffer Indexes : register(b1)
 {
-    uint   PointsPerRow;
+    uint   QuadsPerRow;
     float  Padding0;
     float2 Padding1;
 }
@@ -177,6 +177,7 @@ PointNormal lerp(PointNormal a, PointNormal b, float s)
     pn.normal = lerp(a.normal, b.normal, s);
     return pn;
 }
+
 PointNormal pickPN(float u, float v, int i)
 {
     if (i == 0)
@@ -191,17 +192,37 @@ PointNormal pickPN(float u, float v, int i)
 
 
 
-VSOutput VSMain(uint vid : SV_VertexID)
+
+
+VSOutput VSMain(uint vid : SV_VertexID, uint iid : SV_InstanceID)
 {
     VSOutput O;
     
-    uint N = max(2, PointsPerRow);
+    uint N = max(1, QuadsPerRow);
     
-    uint x = vid % N;
-    uint y = vid / N;
+    uint quad_col = iid % N;
+    uint quad_row = iid / N;
     
-    float u = x / float(N - 1);
-    float v = y / float(N - 1); 
+    float size_quad = 1.f / float(N);
+    
+    float2 map_vertex[6] =
+    {
+        0, 0,
+        0, 1,
+        1, 1,
+        
+        0, 0,
+        1, 1,
+        1, 0
+    };
+    
+    
+    
+    
+    float u = quad_col / float(N) + map_vertex[vid].x * size_quad;
+    float v = quad_row / float(N) + map_vertex[vid].y * size_quad;
+    
+    
     
     float timee = time * 0.125 * 0.8;
     float phase = frac(timee);
@@ -216,7 +237,8 @@ VSOutput VSMain(uint vid : SV_VertexID)
     PointNormal a = pickPN(u,v,idx);
     PointNormal b = pickPN(u,v,(idx + 1) % NN);
 
-    PointNormal outt = lerp(a, b, s);
+    //PointNormal outt = lerp(a, b, s);
+    PointNormal outt = uv_to_circle(u,v);
     
     O.posWS = outt.pos;
     O.posH = mul(float4(outt.pos, 1), WorldViewProj);
@@ -236,9 +258,9 @@ float4 PSMain(VSOutput IN, uint pid : SV_PrimitiveId) : SV_Target
     float xor_pattern = float(val1 % 256) / 255.f;
     float3 xor_color = float3(1.f - xor_pattern, xor_pattern, float(val1 % 128) / 127.f);
     
+    float pid_color = randomColor(pid).xyz;
     
-    
-    float3 koef_diffuse = xor_color;
+    float3 koef_diffuse = lerp(pid_color, xor_color, 0.7f);
     float3 normal  = IN.normal;
     
     float koef_ambient = 0.15f;

@@ -147,7 +147,6 @@
     <ClCompile Include="source\Camera\Camera.cpp" />
     <ClCompile Include="source\LerpedValue\LerpedValue.cpp" />
     <ClCompile Include="source\Shader\DX11.Shader.cpp" />
-    <ClCompile Include="source\SoftwareTesselation\SoftwareTesselation.cpp" />
     <ClCompile Include="source\Time\FPS.Limiter.cpp" />
     <ClCompile Include="source\Framework\DX11.Framework.core.cpp" />
     <ClCompile Include="source\Framework\DX11.Framework.directx.cpp" />
@@ -163,7 +162,6 @@
     <ClInclude Include="source\Camera\Camera.h" />
     <ClInclude Include="source\LerpedValue\LerpedValue.h" />
     <ClInclude Include="source\Shader\DX11.Shader.h" />
-    <ClInclude Include="source\SoftwareTesselation\SoftwareTesselation.h" />
     <ClInclude Include="source\Time\FPS.Limiter.h" />
     <ClInclude Include="source\Framework\DX11.Framework.h" />
     <ClInclude Include="source\Framework\Enums\Keyboard.Enums.h" />

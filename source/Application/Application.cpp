@@ -42,16 +42,9 @@ void Application::Frame() {
 	UINT offset = 0;
 	ID3D11Buffer* nullVB[1] = { nullptr };
 	GetContext()->IASetVertexBuffers(0, 0, nullptr, &stride, &offset);
-	GetContext()->IASetIndexBuffer(indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 	GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	/*
-	XMMATRIX wvp = XMMatrixOrthographicOffCenterLH(
-		-2.0f, 2.0f,   // left, right
-		-2.0f, 2.0f,   // bottom, top 
-		  0.0f,  1.0f    // near, far
-	);
-	*/
+	
 
 	auto size = framework::window::GetSize();
 
@@ -95,13 +88,9 @@ void Application::Frame() {
 	shader.UpdateConstantBuffer("LightDirectional", &LIGHT, sizeof(LIGHT));
 
 
-
-
-
-
-
 	shader.Bind();
-	GetContext()->DrawIndexed(index_count, 0, 0);
+
+	GetContext()->DrawInstanced(6, count_quads, 0, 0);
 
 }
 
@@ -124,26 +113,15 @@ void Application::SubSubdivision() {
 }
 
 HRESULT Application::UpdateSubdivision() {
-	indexBuffer.Reset();
+	// current_Subdivision
 
-	std::vector<UINT> indexes = makeIndexes(current_Subdivision);
+	count_quads = (current_Subdivision);
+	count_quads *= count_quads;
 
-
-	D3D11_BUFFER_DESC ibd = {};
-	ibd.Usage = D3D11_USAGE_DEFAULT;
-	ibd.ByteWidth = indexes.size() * sizeof(UINT);
-	ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	D3D11_SUBRESOURCE_DATA iinit = {};
-	iinit.pSysMem = indexes.data();
-
-	framework::directx::GetDevice()->CreateBuffer(&ibd, &iinit, indexBuffer.GetAddressOf());
-
-
-	INDEXES.PointsPerRow = current_Subdivision;
+	INDEXES.QuadsPerRow = current_Subdivision;
 	shader.UpdateConstantBuffer("Indexes", &INDEXES, sizeof(INDEXES));
 	shader.BindConstantBufferToVS("Indexes");
 
-	index_count = indexes.size();
 
 	return S_OK;
 }

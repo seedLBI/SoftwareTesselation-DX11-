@@ -6,8 +6,6 @@
 #include "Shader/DX11.Shader.h"
 #include <wrl/client.h>
 
-#include "SoftwareTesselation/SoftwareTesselation.h"
-
 #include "Camera/Camera.h"
 
 using namespace DirectX;
@@ -29,7 +27,7 @@ private:
 	} MVP;
 
 	struct cbuffer_Indexes {
-		UINT PointsPerRow; 
+		UINT QuadsPerRow; 
 		UINT pad[3];
 	} INDEXES;
 
@@ -50,9 +48,8 @@ private:
 
 	HRESULT UpdateSubdivision();
 
-	UINT index_count = 0;
+	UINT count_quads = 0;
 
-	ComPtr<ID3D11Buffer> indexBuffer;
 	DX11_Shader shader;
 
 
