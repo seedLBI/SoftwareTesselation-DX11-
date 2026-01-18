@@ -194,14 +194,16 @@ PointNormal pickPN(float u, float v, int i)
 
 
 
-VSOutput VSMain(uint vid : SV_VertexID, uint iid : SV_InstanceID)
+VSOutput VSMain(uint v_id : SV_VertexID, uint i_id : SV_InstanceID)
 {
     VSOutput O;
     
     uint N = max(1, QuadsPerRow);
     
-    uint quad_col = iid % N;
-    uint quad_row = iid / N;
+    uint2 quad_index = uint2(
+        i_id % N, // col
+        i_id / N  // row
+    );
     
     float size_quad = 1.f / float(N);
     
@@ -216,14 +218,9 @@ VSOutput VSMain(uint vid : SV_VertexID, uint iid : SV_InstanceID)
         1, 0
     };
     
+    float2 uv = quad_index / float(N) + map_vertex[v_id] * size_quad;
     
-    
-    
-    float u = quad_col / float(N) + map_vertex[vid].x * size_quad;
-    float v = quad_row / float(N) + map_vertex[vid].y * size_quad;
-    
-    
-    
+
     float timee = time * 0.125 * 0.8;
     float phase = frac(timee);
 
@@ -234,15 +231,15 @@ VSOutput VSMain(uint vid : SV_VertexID, uint iid : SV_InstanceID)
 
     float s = smoothstep(0.0, 1.0, local);
 
-    PointNormal a = pickPN(u,v,idx);
-    PointNormal b = pickPN(u,v,(idx + 1) % NN);
+    PointNormal a = pickPN(uv.x, uv.y,idx);
+    PointNormal b = pickPN(uv.x, uv.y, (idx + 1) % NN);
 
     PointNormal outt = lerp(a, b, s);
     //PointNormal outt = uv_to_circle(u,v);
     
     O.posWS = outt.pos;
     O.posH = mul(float4(outt.pos, 1), WorldViewProj);
-    O.uv = float2(u,v);
+    O.uv = uv;
     O.normal = outt.normal;
 
     return O;
