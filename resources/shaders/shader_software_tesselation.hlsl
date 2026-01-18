@@ -237,8 +237,8 @@ VSOutput VSMain(uint vid : SV_VertexID, uint iid : SV_InstanceID)
     PointNormal a = pickPN(u,v,idx);
     PointNormal b = pickPN(u,v,(idx + 1) % NN);
 
-    //PointNormal outt = lerp(a, b, s);
-    PointNormal outt = uv_to_circle(u,v);
+    PointNormal outt = lerp(a, b, s);
+    //PointNormal outt = uv_to_circle(u,v);
     
     O.posWS = outt.pos;
     O.posH = mul(float4(outt.pos, 1), WorldViewProj);
@@ -260,7 +260,7 @@ float4 PSMain(VSOutput IN, uint pid : SV_PrimitiveId) : SV_Target
     
     float pid_color = randomColor(pid).xyz;
     
-    float3 koef_diffuse = lerp(pid_color, xor_color, 0.7f);
+    float3 koef_diffuse = lerp(pid_color, xor_color, 0.9f);
     float3 normal  = IN.normal;
     
     float koef_ambient = 0.15f;
