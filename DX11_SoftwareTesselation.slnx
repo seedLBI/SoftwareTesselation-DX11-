@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="DX11_SoftwareTesselation.vcxproj" Id="7316a6e3-3dd4-48cb-ade8-49959d79ec4b" />
+</Solution>

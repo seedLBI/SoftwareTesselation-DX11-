@@ -1,0 +1,112 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Исходные файлы">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Файлы заголовков">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Файлы ресурсов">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Исходные файлы\FPS_Limiter">
+      <UniqueIdentifier>{749efa1f-05d5-4da2-b5d0-d8fb191b3209}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\Timer">
+      <UniqueIdentifier>{d2d19f8f-6fe9-4110-a878-c20cb6d542c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\Core">
+      <UniqueIdentifier>{1cec861f-106a-40c7-904d-3b98b32e080e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\Core\Framework">
+      <UniqueIdentifier>{a51743ca-7575-4022-81c8-e8c619645584}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="source\main.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Time\FPS.Limiter.cpp">
+      <Filter>Исходные файлы\FPS_Limiter</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Time\Timer.cpp">
+      <Filter>Исходные файлы\Timer</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Framework\DX11.Framework.time.cpp">
+      <Filter>Исходные файлы\Core\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Time\Timer.HighResolution.cpp">
+      <Filter>Исходные файлы\Timer</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Framework\DX11.Framework.core.cpp">
+      <Filter>Исходные файлы\Core\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Framework\DX11.Framework.window.cpp">
+      <Filter>Исходные файлы\Core\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Framework\DX11.Framework.directx.cpp">
+      <Filter>Исходные файлы\Core\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Framework\DX11.Framework.input.cpp">
+      <Filter>Исходные файлы\Core\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Shader\DX11.Shader.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Application\Application.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="source\SoftwareTesselation\SoftwareTesselation.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="source\LerpedValue\LerpedValue.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Camera\Camera.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="source\Time\FPS.Limiter.h">
+      <Filter>Исходные файлы\FPS_Limiter</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Time\Timer.h">
+      <Filter>Исходные файлы\Timer</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Framework\DX11.Framework.h">
+      <Filter>Исходные файлы\Core\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Time\Timer.HighResolution.h">
+      <Filter>Исходные файлы\Timer</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Framework\Enums\Keyboard.Enums.h">
+      <Filter>Исходные файлы\Core\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Framework\Enums\Mouse.Enums.h">
+      <Filter>Исходные файлы\Core\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Shader\DX11.Shader.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Application\Application.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="source\SoftwareTesselation\SoftwareTesselation.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Camera\Camera.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="source\LerpedValue\LerpedValue.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="resources\shaders\shader_triangle.hlsl" />
+    <CopyFileToFolders Include="resources\shaders\shader_software_tesselation.hlsl" />
+  </ItemGroup>
+</Project>
