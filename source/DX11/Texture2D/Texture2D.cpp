@@ -3,6 +3,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+#include <iostream>
+
 Texture2D::Texture2D(const std::string& path2file, int count_desired_channels) {
 	LoadTextureFromFile(path2file, count_desired_channels);
 }
@@ -12,9 +14,17 @@ Texture2D::~Texture2D() {
 }
 
 void Texture2D::LoadTextureFromFile(const std::string& path2file, int count_desired_channels) {
+
+	std::cout << "\tTexture2D::LoadTextureFromFile\n";
+
 	int width, height, channels;
 	//stbi_set_flip_vertically_on_load(true);
 	uint8_t* pixels = stbi_load(path2file.c_str(), &width, &height, &channels, 4);
+
+	std::cout << "\t==TEXTURE INFO==\n";
+	std::cout << "\t\twidth:    " << width << std::endl;
+	std::cout << "\t\theight:   " << height << std::endl;
+	std::cout << "\t\tchannels: " << channels << std::endl;
 
 
 	D3D11_TEXTURE2D_DESC desc = {};
@@ -36,12 +46,14 @@ void Texture2D::LoadTextureFromFile(const std::string& path2file, int count_desi
 
 	HRESULT hr = framework::directx::GetDevice()->CreateTexture2D(&desc, &initData, &tex);
 	if (FAILED(hr)) {
-
+		std::cout << "ERROR CreateTexture2D\n";
+		exit(-1111);
 	}
 
 	hr = framework::directx::GetDevice()->CreateShaderResourceView(tex, nullptr, &srv);
 	if (FAILED(hr)) {
-
+		std::cout << "ERROR CreateShaderResourceView\n";
+		exit(-1111);
 	}
 
 	stbi_image_free(pixels);

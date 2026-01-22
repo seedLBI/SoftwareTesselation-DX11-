@@ -10,30 +10,38 @@ Application::Application(HINSTANCE hInstance, int nCmdShow) {
 
 
 
-
+	std::cout << "[SHADER] - Trying compile shaders\n";
 	shader.LoadShadersFromFile(L"resources\\shaders\\shader_pbr.hlsl");
 	shader_billboard_light.LoadShadersFromFile_withGS(L"resources\\shaders\\shadel_light_sprite.hlsl");
 
+	std::cout << "[CBUFFER] - Initing cbuffers\n";
 	cbuffer_MatrixView	= new ConstantBuffer<c_MatrixView>(0);
 	cbuffer_Utils		= new ConstantBuffer<c_Utils>(1);
 	cbuffer_Light		= new ConstantBuffer<c_Light>(2);
 
+	std::cout << "[CBUFFER] - Binding\n";
 	cbuffer_MatrixView->BindToAll(0);
 	cbuffer_Utils->BindToAll(1);
 	cbuffer_Light->BindToAll(2);
 
-
+	std::cout << "[PBR] - Load\n";
 	pbrData.LoadFromFolder("resources\\pbr_textures\\tile");
 	pbrData2.LoadFromFolder("resources\\pbr_textures\\bricks");
-	pbrData.BindToAll();
 
+	std::cout << "[PBR] - Bind [bricks]\n";
+	pbrData2.BindToAll();
+
+	std::cout << "[SAMPLER STATE] - Creting\n";
 	Samp = SamplerState::CreateLinearWrap();
+
+	std::cout << "[SAMPLER STATE] - Binding\n";
 	Samp.BindToPS(0);
 	Samp.BindToVS(0);
 
 
 
 	current_Subdivision = 1024;
+
 
 	UpdateSubdivision();
 
@@ -90,6 +98,7 @@ void Application::SubSubdivision() {
 }
 
 HRESULT Application::UpdateSubdivision() {
+	std::cout << "[SUBDIVISION] - Update\n";
 
 	count_quads = (current_Subdivision);
 	count_quads *= count_quads;
