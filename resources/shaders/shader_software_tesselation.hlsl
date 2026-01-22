@@ -234,8 +234,8 @@ VSOutput VSMain(uint v_id : SV_VertexID, uint i_id : SV_InstanceID)
     PointNormal a = pickPN(uv.x, uv.y,idx);
     PointNormal b = pickPN(uv.x, uv.y, (idx + 1) % NN);
 
-    PointNormal outt = lerp(a, b, s);
-    //PointNormal outt = uv_to_circle(u,v);
+    //PointNormal outt = lerp(a, b, s);
+    PointNormal outt = uv_to_torus(uv.x, uv.y);
     
     O.posWS = outt.pos;
     O.posH = mul(float4(outt.pos, 1), WorldViewProj);
@@ -247,6 +247,19 @@ VSOutput VSMain(uint v_id : SV_VertexID, uint i_id : SV_InstanceID)
 
 
 
+
+
+Texture2D albedo       : register(t0);
+Texture2D ao           : register(t1);
+Texture2D displacement : register(t2);
+Texture2D metallic     : register(t3);
+Texture2D opacity      : register(t4);
+Texture2D roughness    : register(t5);
+Texture2D normal       : register(t6);
+
+SamplerState Samp : register(s0);
+
+
 float4 PSMain(VSOutput IN, uint pid : SV_PrimitiveId) : SV_Target
 {
     
@@ -255,14 +268,16 @@ float4 PSMain(VSOutput IN, uint pid : SV_PrimitiveId) : SV_Target
     float xor_pattern = float(val1 % 256) / 255.f;
     float3 xor_color = float3(1.f - xor_pattern, xor_pattern, float(val1 % 128) / 127.f);
     
+    float3 color_albedo = albedo.Sample(Samp, IN.uv);
+    
     float pid_color = randomColor(pid).xyz;
     
-    float3 koef_diffuse = lerp(pid_color, xor_color, 0.9f);
+    float3 koef_diffuse = lerp(pid_color, color_albedo, 0.9f);
     float3 normal  = IN.normal;
     
     float koef_ambient = 0.15f;
     float koef_specular = 0.5f;
-    float shininess = 64.f;
+    float shininess = 128.f;
     
     float3 N = normalize(IN.normal);
     float3 L = normalize(light_dir.xyz);

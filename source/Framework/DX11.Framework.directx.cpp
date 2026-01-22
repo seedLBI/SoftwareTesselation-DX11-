@@ -220,7 +220,7 @@ namespace framework {
 				// Set up the description of the stencil state.
 				depthStencilDesc.DepthEnable = true;
 				depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-				depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
+				depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
 
 				depthStencilDesc.StencilEnable = true;
 				depthStencilDesc.StencilReadMask = 0xFF;
@@ -298,6 +298,26 @@ namespace framework {
 				fieldOfView = 3.141592654f / 4.0f;
 				screenAspect = (float)core::VARS::window::mScreenWidth / (float)core::VARS::window::mScreenHeight;
 
+
+
+
+				ID3D11BlendState* m_alphaEnableBlendingState = nullptr;
+				D3D11_BLEND_DESC blendDesc;
+				ZeroMemory(&blendDesc, sizeof(blendDesc));
+				blendDesc.RenderTarget[0].BlendEnable = TRUE;
+				blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+				blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+				blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+				blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE ;
+				blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+				blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+				blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+				result = m_device->CreateBlendState(&blendDesc, &m_alphaEnableBlendingState);
+
+				float blendFactor[4] = { 0,0,0,0 }; // обычно 0
+				// чтоб применять ко всем маскам: sampleMask = 0xffffffff
+				framework::directx::GetContext()->OMSetBlendState(m_alphaEnableBlendingState, blendFactor, 0xffffffff);
 
 			}
 			void TerminateDirectX() {

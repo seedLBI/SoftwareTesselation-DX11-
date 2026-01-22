@@ -54,7 +54,7 @@
     <ClCompile Include="source\Framework\DX11.Framework.input.cpp">
       <Filter>Исходные файлы\Core\Framework</Filter>
     </ClCompile>
-    <ClCompile Include="source\Shader\DX11.Shader.cpp">
+    <ClCompile Include="source\DX11\Shader\DX11.Shader.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="source\Application\Application.cpp">
@@ -64,6 +64,15 @@
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="source\Camera\Camera.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="source\DX11\SamplerState\SamplerState.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="source\DX11\Texture2D\Texture2D.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="source\PBR_TextureObject\PBR.TextureObject.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
@@ -86,7 +95,7 @@
     <ClInclude Include="source\Framework\Enums\Mouse.Enums.h">
       <Filter>Исходные файлы\Core\Framework</Filter>
     </ClInclude>
-    <ClInclude Include="source\Shader\DX11.Shader.h">
+    <ClInclude Include="source\DX11\Shader\DX11.Shader.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="source\Application\Application.h">
@@ -98,9 +107,25 @@
     <ClInclude Include="source\LerpedValue\LerpedValue.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
+    <ClInclude Include="source\DX11\ConstantBuffer\ConstantBuffer.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="source\DX11\Texture2D\DX11.Texture2D.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="source\DX11\SamplerState\SamplerState.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="source\DX11\Texture2D\Texture2D.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="source\PBR_TextureObject\PBR.TextureObject.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CopyFileToFolders Include="resources\shaders\shader_triangle.hlsl" />
     <CopyFileToFolders Include="resources\shaders\shader_software_tesselation.hlsl" />
+    <CopyFileToFolders Include="resources\shaders\shader_pbr.hlsl" />
+    <CopyFileToFolders Include="resources\shaders\shadel_light_sprite.hlsl" />
   </ItemGroup>
 </Project>

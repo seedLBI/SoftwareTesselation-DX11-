@@ -37,6 +37,22 @@ float& Camera::GetFOV() {
 XMVECTOR& Camera::GetPos() {
 	return Pos.GetLerped();
 }
+XMVECTOR& Camera::GetFront() {
+	return Front.GetLerped();
+}
+XMVECTOR& Camera::GetUp() {
+	return Up.GetLerped();
+}
+XMVECTOR Camera::GetRight() {
+	XMVECTOR result = XMVector3Normalize(
+		XMVector3Cross(
+			Front.GetLerped(), 
+			Up.GetLerped()
+		)
+	);
+
+	return result;
+}
 
 
 void Camera::UpdateMovement() {
