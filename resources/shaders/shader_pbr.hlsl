@@ -28,6 +28,18 @@ cbuffer Light : register(b2)
 }
 
 
+cbuffer ObjectInfo : register(b3)
+{
+    float3 obj_pos;
+    float obj_padding1;
+    float3 obj_albedo;
+    float  obj_ao;
+    float  obj_metallic;
+    float  obj_roughness;
+    
+    float3 obj_padding;
+}
+
 
 Texture2D tex_albedo       : register(t0);
 Texture2D tex_ao           : register(t1);
@@ -38,8 +50,6 @@ Texture2D tex_roughness    : register(t5);
 Texture2D tex_normal       : register(t6);
 
 SamplerState Samp : register(s0);
-
-
 
 
 static const float PI = 3.14159265359;
@@ -92,8 +102,36 @@ PointNormal uv_to_torus(float2 uv)
     
     return pn;
 }
+PointNormal uv_to_sphere(float2 uv)
+{
+    float r = 1.f;
+    
+    PointNormal pn;
+    pn.normal    = float3(
+        cos(2.f * PI * uv.x) * sin(PI * uv.y),
+        -cos(PI * uv.y),
+        sin(2.f * PI * uv.x) * sin(PI * uv.y)
+    );
+    
+    pn.tangent   = float3(
+        -sin(2.f * PI * uv.x),
+        0, 
+        cos(2.f * PI * uv.x)
+    );
+    
+    pn.bitangent = float3(
+        cos(2 * PI * uv.x) * cos(PI * uv.y),
+        sin(PI * uv.y),
+        sin(2 * PI * uv.x) * cos(PI * uv.y)
+    );
+    
+    pn.pos = r * pn.normal;
 
-float2 getUV_fromGrid(uint quads_per_row,uint v_id, uint i_id)
+    return pn;
+}
+
+
+float2 getUV_fromGrid(uint quads_per_row, uint v_id, uint i_id)
 {
     uint N = max(1, quads_per_row);
     
@@ -133,16 +171,18 @@ VSOutput VSMain(uint v_id : SV_VertexID, uint i_id : SV_InstanceID)
 {
     float2 uv = getUV_fromGrid(quads_row, v_id, i_id);
     
-    PointNormal geom = uv_to_torus(uv);
+    PointNormal geom = uv_to_sphere(uv);
 
-
-    float displacement = tex_displacement.SampleLevel(Samp, uv * 2.f,0).x;
-    displacement = displacement * 2.0 - 1.0;
-    geom.pos += geom.normal * displacement * 0.08f;
+    geom.pos += obj_pos;
     
+    /*
+    float displacement = tex_displacement.SampleLevel(Samp, uv * 1.f,0).x;
+    displacement = displacement * 2.0 - 1.0;
+    geom.pos += geom.normal * displacement * 0.05f;
+    */    
     
     VSOutput O;
-    O.uv        = uv * 2.f;
+    O.uv        = uv * 1.f;
     O.posVertex = mul(float4(geom.pos, 1), WorldViewProj);
     O.posWorld  = geom.pos;
     O.normal    = geom.normal;
@@ -187,43 +227,24 @@ float GeometrySmith(float3 N, float3 V, float3 L, float roughness)
 }
 float3 fresnelSchlick(float cosTheta, float3 F0)
 {
-    return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+    float t = pow(1.0 - cosTheta, 5.0);
+    return F0 + (1.0 - F0) * t;
+}
+
+float3 NormalMapping(float3 input_tex_normal, float3 tangent, float3 bitangent, float3 normal)
+{
+    float3x3 TBN = (float3x3(tangent, bitangent, normal));
+    input_tex_normal = input_tex_normal * 2.0 - 1.0;
+    input_tex_normal = normalize(mul(input_tex_normal, TBN));
+    
+    return input_tex_normal;
 }
 
 
-
-//
-// PIXEL PIXEL PIXEL PIXEL      PIXEL PIXEL PIXEL PIXEL
-// PIXEL PIXEL PIXEL       PIXEL      PIXEL PIXEL PIXEL
-// PIXEL       PIXEL PIXEL      PIXEL PIXEL PIXEL PIXEL PIXEL
-//
-
-
-
-
-float4 PSMain(VSOutput IN) : SV_Target
+float3 PBR(float3 posWorld, float3 normal, float3 albedo, float ao, float metallic, float roughness)
 {
-    float3 albedo       = tex_albedo.Sample(Samp, IN.uv).xyz;
-    float3 normal       = tex_normal.Sample(Samp, IN.uv).xyz;
-    float  ao           = tex_ao.Sample(Samp, IN.uv).x;
-    float  metallic     = tex_metallic.Sample(Samp, IN.uv).x;
-    float  opacity      = tex_opacity.Sample(Samp, IN.uv).x;
-    float  roughness    = tex_roughness.Sample(Samp, IN.uv).x;
-
-    
-    // normal mapping
-    float3x3 TBN = (float3x3(IN.tangent, IN.bitangent, IN.normal));
-    normal = normal * 2.0 - 1.0;
-    normal = normalize(mul(normal,TBN));
-    
-    
-    
-    
-    
-    
     float3 N = normalize(normal);
-    float3 V = normalize(PosView - IN.posWorld);
-
+    float3 V = normalize(PosView - posWorld);
     
     float3 F0 = float3(0.04f.xxx);
     F0 = lerp(F0, albedo, metallic);
@@ -232,7 +253,7 @@ float4 PSMain(VSOutput IN) : SV_Target
     
     for (uint i = 0; i < count_lights; ++i)
     {
-        float3 lpwp = lights[i].pos.xyz - IN.posWorld;
+        float3 lpwp = lights[i].pos.xyz - posWorld;
         
         float3 L = normalize(lpwp);
         float3 H = normalize(V + L);
@@ -258,18 +279,46 @@ float4 PSMain(VSOutput IN) : SV_Target
         Lo += (kD * albedo / PI + specular) * radiance * NdotL;
     }
     
-    float3 ambient = float3(0.005f.xxx) * albedo * ao;
+    float3 ambient = float3(0.00f.xxx) * albedo * ao;
     float3 color = ambient + Lo;
-    
-    
-
     
     // HDR tonemapping
     color = color / (color + float3(1.0f.xxx));
+    
     // gamma correct
-    float3 gamma = float3((1.0f / 2.2f).xxx);
-    color = pow(color, gamma);
+    float3 gammaKoef = float3((1.0f / 2.2f).xxx);
+    color = pow(color, gammaKoef);
+    
+    return color;
+}
+
+
+
+//
+// PIXEL PIXEL PIXEL PIXEL      PIXEL PIXEL PIXEL PIXEL
+// PIXEL PIXEL PIXEL       PIXEL      PIXEL PIXEL PIXEL
+// PIXEL       PIXEL PIXEL      PIXEL PIXEL PIXEL PIXEL PIXEL
+//
+float4 PSMain(VSOutput IN) : SV_Target
+{
+    /*
+    float3 albedo       = tex_albedo.Sample(Samp, IN.uv).xyz;
+    float3 normal       = tex_normal.Sample(Samp, IN.uv).xyz;
+    float  ao           = tex_ao.Sample(Samp, IN.uv).x;
+    float  metallic     = tex_metallic.Sample(Samp, IN.uv).x;
+    float  opacity      = tex_opacity.Sample(Samp, IN.uv).x;
+    float  roughness    = tex_roughness.Sample(Samp, IN.uv).x;
+
+    normal = NormalMapping(normal, IN.tangent, IN.bitangent, IN.normal);
+    
+    float3 color = PBR(IN.posWorld, normal, albedo, ao, metallic, roughness);
     
     return float4(color, opacity);
-
+    */
+        
+    
+    
+    float3 color = PBR(IN.posWorld, IN.normal, obj_albedo, obj_ao, obj_metallic, obj_roughness);
+    return float4(color, 1.f);
+      
 }

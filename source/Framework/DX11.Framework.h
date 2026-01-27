@@ -108,8 +108,8 @@ namespace framework {
 			const int& nCmdShow,
 			const bool& showConsole = true,
 			const std::wstring& title = L"DirectX app",
-			const int& width = 1280,
-			const int& height = 720
+			const int& width = 1920,
+			const int& height = 1000
 			);
 
 		void Terminate();

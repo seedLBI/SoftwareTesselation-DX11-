@@ -18,18 +18,23 @@ Application::Application(HINSTANCE hInstance, int nCmdShow) {
 	cbuffer_MatrixView	= new ConstantBuffer<c_MatrixView>(0);
 	cbuffer_Utils		= new ConstantBuffer<c_Utils>(1);
 	cbuffer_Light		= new ConstantBuffer<c_Light>(2);
+	cbuffer_ObjectInfo  = new ConstantBuffer<c_ObjectInfo>(3);
+
 
 	std::cout << "[CBUFFER] - Binding\n";
 	cbuffer_MatrixView->BindToAll(0);
 	cbuffer_Utils->BindToAll(1);
 	cbuffer_Light->BindToAll(2);
+	cbuffer_ObjectInfo->BindToAll(3);
 
+	
 	std::cout << "[PBR] - Load\n";
 	pbrData.LoadFromFolder("resources\\pbr_textures\\tile");
 	pbrData2.LoadFromFolder("resources\\pbr_textures\\bricks");
 
 	std::cout << "[PBR] - Bind [bricks]\n";
 	pbrData2.BindToAll();
+	
 
 	std::cout << "[SAMPLER STATE] - Creting\n";
 	Samp = SamplerState::CreateLinearWrap();
@@ -40,7 +45,7 @@ Application::Application(HINSTANCE hInstance, int nCmdShow) {
 
 
 
-	current_Subdivision = 1024;
+	current_Subdivision = 32;
 
 
 	UpdateSubdivision();
@@ -69,10 +74,57 @@ void Application::Frame() {
 
 
 	shader.Bind();
-	GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	GetContext()->DrawInstanced(6, count_quads, 0, 0);
+
+	OBJECT_INFO.ao = 1.f;
+	OBJECT_INFO.albedo = { 0.5f,0.f,0.f };
+
+	const int sphereRows = 8;
+	const int sphereColumns = 8;
+	const float spacing = 2.5;
+	for (size_t y = 0; y <= sphereRows; y++){
+
+		float metallic = (float)y / (float)sphereRows;
+		OBJECT_INFO.metallic = metallic;
 
 
+		for (size_t x = 0; x <= sphereColumns; x++) {
+
+			float roughness = (float)x / (float)sphereColumns;
+			if (roughness < 0.05f)
+				roughness = 0.05f;
+
+
+			OBJECT_INFO.roughness = roughness;
+
+			float mid_col = float(sphereColumns) / 2.f;
+			float mid_row = float(sphereRows) / 2.f;
+			float col = (float)x;
+			float row = (float)y;
+			OBJECT_INFO.pos = { 
+				-(col - mid_col) * spacing,
+				(row - mid_row) * spacing,
+				0.f };
+
+
+
+
+			cbuffer_ObjectInfo->Update(OBJECT_INFO);
+
+
+			GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			GetContext()->DrawInstanced(6, count_quads, 0, 0);
+
+
+		}
+	}
+
+
+
+
+
+
+
+	// Light render
 	shader_billboard_light.Bind();
 	GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
 	GetContext()->DrawInstanced(1, UTILS.count_lights, 0, 0);
@@ -111,14 +163,12 @@ HRESULT Application::UpdateSubdivision() {
 }
 
 void Application::Render() {
-	framework::directx::BeginScene(0.0f, 0.0f, 0.0f, 1.f);
+	framework::directx::BeginScene(0.f, 0.f, 0.f, 1.f);
 
 	Frame();
 
 	framework::directx::EndScene();
 }
-
-
 
 
 void Application::Update_cMATRIX() {
@@ -145,22 +195,21 @@ void Application::Update_cTIME() {
 
 void Application::Update_cLIGHT() {
 
+	UTILS.count_lights = 4;
 
-	UTILS.count_lights = 3;
-
-	float time = framework::time::GetTimeProgram() * 3.f;
-
-	LIGHT.lights[0].pos = { 1.f * cos(time), 0.8f, 1.f * sin(time), 0.f };
-	LIGHT.lights[0].color = { 2.f,2.f,2.f,0.f };
-
-	LIGHT.lights[1].pos = { 0.f, 1.f * sin(time), 0.f, 0.f };
-	LIGHT.lights[1].color = { 5.f,0.0f,0.0f,0.f };
+	LIGHT.lights[0].pos = { -10.0f,  10.0f, 10.0f, 0.f };
+	LIGHT.lights[1].pos = { 10.0f,  10.0f, 10.0f, 0.f };
+	LIGHT.lights[2].pos = { -10.0f, -10.0f, 10.0f, 0.f };
+	LIGHT.lights[3].pos = { 10.0f, -10.0f, 10.0f, 0.f };
 
 
-	LIGHT.lights[2].pos = { 2.f * cos(time + 3.14f/2.f), 0.f, 2.f * sin(time + 3.14f / 2.f), 0.f };
-	LIGHT.lights[2].color = { 0.f,0.5f,5.5f,0.f };
 
+	LIGHT.lights[0].color = { 300.0f, 300.0f, 300.0f, 0.f };
+	LIGHT.lights[1].color = { 300.0f, 300.0f, 300.0f, 0.f };
+	LIGHT.lights[2].color = { 300.0f, 300.0f, 300.0f, 0.f };
+	LIGHT.lights[3].color = { 300.0f, 300.0f, 300.0f, 0.f };
 
+	
 	XMFLOAT4 Camera_pos;
 	XMStoreFloat4(&Camera_pos, camera.GetPos());
 

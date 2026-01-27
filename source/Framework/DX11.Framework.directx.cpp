@@ -428,7 +428,14 @@ namespace framework {
 		}
 
 		void ResetViewport() {
+			if (!m_deviceContext)
+				return;
+
+			m_viewport.Width = window::GetSize().x;
+			m_viewport.Height = window::GetSize().y;
 			m_deviceContext->RSSetViewports(1, &m_viewport);
+			
+
 		}
 
 

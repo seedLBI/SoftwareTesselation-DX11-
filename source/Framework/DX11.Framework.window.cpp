@@ -5,18 +5,19 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
-	case WM_INPUT: {
-		framework::core::VARS::input::mouse::HandleMouseInput(lParam);
-		break;
-	}
-	case WM_CLOSE:
-		PostQuitMessage(0);
-		break;
-
-	case WM_KEYDOWN:
-		if (wParam == VK_ESCAPE)
+		case WM_INPUT: {
+			framework::core::VARS::input::mouse::HandleMouseInput(lParam);
+			break;
+		}
+		case WM_CLOSE: {
 			PostQuitMessage(0);
-		break;
+			break;
+		}
+		case WM_KEYDOWN: {
+			if (wParam == VK_ESCAPE)
+				PostQuitMessage(0);
+			break;
+		}
 	}
 	return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }

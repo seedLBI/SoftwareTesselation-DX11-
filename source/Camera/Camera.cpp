@@ -61,7 +61,7 @@ void Camera::UpdateMovement() {
 	using namespace framework::input;
 
 	if (IsKeyDown(KEY_LEFT_SHIFT))
-		cameraSpeed *= 5.f;
+		cameraSpeed *= 25.f;
 
 	if (IsKeyDown(KEY_W))
 		Pos.GetReal() -= cameraSpeed * Front.GetReal();
@@ -181,7 +181,7 @@ void Camera::UpdateUp() {
 
 void Camera::UpdateLerp() {
 
-	float speed = 12.f;
+	float speed = 16.f;
 	float time = 1.f - std::exp(-speed * framework::time::GetDeltaTime());
 
 	Pos.Update(time);

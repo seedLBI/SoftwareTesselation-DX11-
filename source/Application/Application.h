@@ -57,14 +57,28 @@ private:
 		XMFLOAT4 pos;
 		XMFLOAT4 color;
 	};
-
 	struct c_Light {
 		LightObject lights[16];
 	} LIGHT;
-	
+
+
+	struct c_ObjectInfo {
+		XMFLOAT3 pos;
+		float padding1;
+		XMFLOAT3 albedo;
+		float ao;
+		float metallic;
+		float roughness;
+
+
+		XMFLOAT2 padding;
+	} OBJECT_INFO;
+
+
 	ConstantBuffer<c_MatrixView>*   cbuffer_MatrixView = 0;
 	ConstantBuffer<c_Utils>*		cbuffer_Utils = 0;
 	ConstantBuffer<c_Light>*		cbuffer_Light = 0;
+	ConstantBuffer<c_ObjectInfo>*   cbuffer_ObjectInfo = 0;
 
 
 	void Update_cTIME();
