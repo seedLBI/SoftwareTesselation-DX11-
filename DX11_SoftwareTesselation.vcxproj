@@ -147,11 +147,14 @@
   <ItemGroup>
     <ClCompile Include="source\Application\Application.cpp" />
     <ClCompile Include="source\Camera\Camera.cpp" />
+    <ClCompile Include="source\DX11\RenderTexture2D\RenderTexture2D.cpp" />
     <ClCompile Include="source\DX11\SamplerState\SamplerState.cpp" />
     <ClCompile Include="source\DX11\Texture2D\Texture2D.cpp" />
+    <ClCompile Include="source\Framework\GPUInfo\GPUInfo.cpp" />
     <ClCompile Include="source\LerpedValue\LerpedValue.cpp" />
     <ClCompile Include="source\PBR_TextureObject\PBR.TextureObject.cpp" />
     <ClCompile Include="source\DX11\Shader\DX11.Shader.cpp" />
+    <ClCompile Include="source\RenderPremitive\QuadFullScreen\Render.QuadFullScreen.cpp" />
     <ClCompile Include="source\Time\FPS.Limiter.cpp" />
     <ClCompile Include="source\Framework\DX11.Framework.core.cpp" />
     <ClCompile Include="source\Framework\DX11.Framework.directx.cpp" />
@@ -166,12 +169,15 @@
     <ClInclude Include="source\Application\Application.h" />
     <ClInclude Include="source\Camera\Camera.h" />
     <ClInclude Include="source\DX11\ConstantBuffer\ConstantBuffer.h" />
+    <ClInclude Include="source\DX11\RenderTexture2D\RenderTexture2D.h" />
     <ClInclude Include="source\DX11\SamplerState\SamplerState.h" />
     <ClInclude Include="source\DX11\Texture2D\DX11.Texture2D.h" />
     <ClInclude Include="source\DX11\Texture2D\Texture2D.h" />
+    <ClInclude Include="source\Framework\GPUInfo\GPUInfo.h" />
     <ClInclude Include="source\LerpedValue\LerpedValue.h" />
     <ClInclude Include="source\PBR_TextureObject\PBR.TextureObject.h" />
     <ClInclude Include="source\DX11\Shader\DX11.Shader.h" />
+    <ClInclude Include="source\RenderPremitive\QuadFullScreen\Render.QuadFullScreen.h" />
     <ClInclude Include="source\Time\FPS.Limiter.h" />
     <ClInclude Include="source\Framework\DX11.Framework.h" />
     <ClInclude Include="source\Framework\Enums\Keyboard.Enums.h" />
@@ -200,6 +206,12 @@
     <CopyFileToFolders Include="resources\shaders\shadel_light_sprite.hlsl">
       <FileType>Document</FileType>
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\resources\shaders</DestinationFolders>
+    </CopyFileToFolders>
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="resources\shaders\shader_test_ndc_quad.hlsl">
+      <FileType>Document</FileType>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\resources\shaders</DestinationFolders>
     </CopyFileToFolders>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

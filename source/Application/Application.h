@@ -14,7 +14,7 @@
 
 #include "Camera/Camera.h"
 
-
+#include "RenderPremitive/QuadFullScreen/Render.QuadFullScreen.h"
 
 using namespace DirectX;
 
@@ -97,9 +97,14 @@ private:
 
 	DX11_Shader shader;
 	DX11_Shader shader_billboard_light;
+	DX11_Shader shader_test_ndc;
+
+	Render_QuadFullscreen* quadF;
 
 
 	Camera camera;
+
+
 
 };
 

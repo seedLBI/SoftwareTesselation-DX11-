@@ -75,6 +75,15 @@
     <ClCompile Include="source\PBR_TextureObject\PBR.TextureObject.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="source\DX11\RenderTexture2D\RenderTexture2D.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="source\RenderPremitive\QuadFullScreen\Render.QuadFullScreen.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Framework\GPUInfo\GPUInfo.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Time\FPS.Limiter.h">
@@ -122,10 +131,20 @@
     <ClInclude Include="source\PBR_TextureObject\PBR.TextureObject.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
+    <ClInclude Include="source\DX11\RenderTexture2D\RenderTexture2D.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="source\RenderPremitive\QuadFullScreen\Render.QuadFullScreen.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Framework\GPUInfo\GPUInfo.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="resources\shaders\shader_software_tesselation.hlsl" />
     <CopyFileToFolders Include="resources\shaders\shader_pbr.hlsl" />
     <CopyFileToFolders Include="resources\shaders\shadel_light_sprite.hlsl" />
+    <CopyFileToFolders Include="resources\shaders\shader_test_ndc_quad.hlsl" />
   </ItemGroup>
 </Project>

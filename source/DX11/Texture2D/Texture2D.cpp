@@ -10,6 +10,63 @@ Texture2D::Texture2D(const std::string& path2file, int count_desired_channels) {
 }
 
 Texture2D::~Texture2D() {
+	Release();
+}
+
+void Texture2D::Release() {
+	if (srv) {
+		srv->Release();
+		srv = nullptr;
+	}
+	if (tex) {
+		tex->Release();
+		tex = nullptr;
+	}
+}
+
+bool Texture2D::CheckBindFlag(UINT flag) {
+	return bindFlag & flag;
+}
+
+void Texture2D::CreateEmpty(
+	UINT width, UINT height,
+	UINT bindFlags,
+	DXGI_FORMAT format,
+	D3D11_USAGE usage,
+	UINT cpuAccessFlags,
+	UINT mipLevels,
+	UINT arraySize) 
+{
+
+	this->bindFlag = bindFlags;
+
+	D3D11_TEXTURE2D_DESC desc = {};
+	desc.Width = width;
+	desc.Height = height;
+	desc.Format = format;
+	desc.BindFlags = bindFlags;
+	desc.Usage = usage;
+	desc.CPUAccessFlags = cpuAccessFlags;
+	desc.MipLevels = mipLevels;
+	desc.ArraySize = arraySize;
+
+	desc.SampleDesc.Count = 1;
+	desc.SampleDesc.Quality = 0;
+	desc.MiscFlags = 0;
+
+	HRESULT hr = framework::directx::GetDevice()->CreateTexture2D(&desc, nullptr, &tex);
+	if (FAILED(hr)) {
+		std::cout << "ERROR CreateTexture2D\n";
+		exit(-1111);
+	}
+
+	if (CheckBindFlag(D3D11_BIND_SHADER_RESOURCE)) {
+		hr = framework::directx::GetDevice()->CreateShaderResourceView(tex, nullptr, &srv);
+		if (FAILED(hr)) {
+			std::cout << "ERROR CreateShaderResourceView\n";
+			exit(-1111);
+		}
+	}
 
 }
 
@@ -87,4 +144,11 @@ void Texture2D::BindToAll(UINT slot) {
 	BindToDS(slot);
 	BindToGS(slot);
 	BindToPS(slot);
+}
+
+ID3D11ShaderResourceView* Texture2D::GetSRV() const {
+	return srv;
+}
+ID3D11Texture2D* Texture2D::GetTexture() const {
+	return tex;
 }

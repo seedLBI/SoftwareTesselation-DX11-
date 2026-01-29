@@ -80,7 +80,7 @@ private:
 	ComPtr <ID3DBlob> vsBytecode;
 	ComPtr <ID3DBlob> gsBytecode;
 	ComPtr <ID3DBlob> psBytecode;
-
+	
 	ComPtr <ID3D11InputLayout> inputLayout;
 
 };

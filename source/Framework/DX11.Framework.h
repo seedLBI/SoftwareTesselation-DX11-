@@ -11,6 +11,8 @@
 #include "Enums/Keyboard.Enums.h"
 #include "Enums/Mouse.Enums.h"
 
+#include "GPUInfo/GPUInfo.h"
+
 #include <windows.h>
 #include <string>
 #include <vector>

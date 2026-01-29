@@ -13,6 +13,10 @@ Application::Application(HINSTANCE hInstance, int nCmdShow) {
 	std::cout << "[SHADER] - Trying compile shaders\n";
 	shader.LoadShadersFromFile(L"resources\\shaders\\shader_pbr.hlsl");
 	shader_billboard_light.LoadShadersFromFile_withGS(L"resources\\shaders\\shadel_light_sprite.hlsl");
+	shader_test_ndc.LoadShadersFromFile(L"resources\\shaders\\shader_test_ndc_quad.hlsl");
+
+	quadF = new Render_QuadFullscreen(shader_test_ndc);
+
 
 	std::cout << "[CBUFFER] - Initing cbuffers\n";
 	cbuffer_MatrixView	= new ConstantBuffer<c_MatrixView>(0);
@@ -29,11 +33,11 @@ Application::Application(HINSTANCE hInstance, int nCmdShow) {
 
 	
 	std::cout << "[PBR] - Load\n";
-	pbrData.LoadFromFolder("resources\\pbr_textures\\tile");
-	pbrData2.LoadFromFolder("resources\\pbr_textures\\bricks");
+	//pbrData.LoadFromFolder("resources\\pbr_textures\\tile");
+	//pbrData2.LoadFromFolder("resources\\pbr_textures\\bricks");
 
 	std::cout << "[PBR] - Bind [bricks]\n";
-	pbrData2.BindToAll();
+	//pbrData2.BindToAll();
 	
 
 	std::cout << "[SAMPLER STATE] - Creting\n";
@@ -64,70 +68,15 @@ inline float fract(float x)
 
 void Application::Frame() {
 	using namespace framework::directx;
-
-	GetContext()->IASetInputLayout(nullptr);
-	UINT stride = 0;
-	UINT offset = 0;
-	ID3D11Buffer* nullVB[1] = { nullptr };
-	GetContext()->IASetVertexBuffers(0, 0, nullptr, &stride, &offset);
+	
+	
 
 
 
-	shader.Bind();
-
-	OBJECT_INFO.ao = 1.f;
-	OBJECT_INFO.albedo = { 0.5f,0.f,0.f };
-
-	const int sphereRows = 8;
-	const int sphereColumns = 8;
-	const float spacing = 2.5;
-	for (size_t y = 0; y <= sphereRows; y++){
-
-		float metallic = (float)y / (float)sphereRows;
-		OBJECT_INFO.metallic = metallic;
+	shader_test_ndc.Bind();
+	quadF->Render();
 
 
-		for (size_t x = 0; x <= sphereColumns; x++) {
-
-			float roughness = (float)x / (float)sphereColumns;
-			if (roughness < 0.05f)
-				roughness = 0.05f;
-
-
-			OBJECT_INFO.roughness = roughness;
-
-			float mid_col = float(sphereColumns) / 2.f;
-			float mid_row = float(sphereRows) / 2.f;
-			float col = (float)x;
-			float row = (float)y;
-			OBJECT_INFO.pos = { 
-				-(col - mid_col) * spacing,
-				(row - mid_row) * spacing,
-				0.f };
-
-
-
-
-			cbuffer_ObjectInfo->Update(OBJECT_INFO);
-
-
-			GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-			GetContext()->DrawInstanced(6, count_quads, 0, 0);
-
-
-		}
-	}
-
-
-
-
-
-
-
-	// Light render
-	shader_billboard_light.Bind();
-	GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
-	GetContext()->DrawInstanced(1, UTILS.count_lights, 0, 0);
 
 }
 
@@ -172,6 +121,8 @@ void Application::Render() {
 
 
 void Application::Update_cMATRIX() {
+
+	
 	auto size = framework::window::GetSize();
 	float aspect = float(size.x) / float(size.y);
 	float r_fov = XMConvertToRadians(camera.GetFOV());
@@ -186,6 +137,16 @@ void Application::Update_cMATRIX() {
 	XMStoreFloat3(&MATRIX.FrontView, camera.GetFront());
 	XMStoreFloat3(&MATRIX.UpView, camera.GetUp());
 	XMStoreFloat3(&MATRIX.RightView, camera.GetRight());
+
+
+	DirectX::XMMATRIX matrix = DirectX::XMMatrixOrthographicLH(
+		1.f,
+		1.f,
+		0.f,
+		1.f
+	);
+
+	XMStoreFloat4x4(&MATRIX.WorldViewProj, matrix);
 }
 
 void Application::Update_cTIME() {

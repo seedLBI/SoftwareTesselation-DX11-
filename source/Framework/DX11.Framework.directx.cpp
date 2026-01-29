@@ -92,18 +92,8 @@ namespace framework {
 
 				printf("\n");
 
-
-				result = adapter->GetDesc(&adapterDesc);
-				if (FAILED(result))
-					assert(1);
-				m_videoCardMemory = (int)(adapterDesc.DedicatedVideoMemory / 1024 / 1024);
-				error = wcstombs_s(&stringLength, m_videoCardDescription, 128, adapterDesc.Description, 128);
-				if (error != 0)
-					assert(1);
-
-
-				printf("Videocard: [%s] \n", m_videoCardDescription);
-				printf("           memory: %i Mb \n", m_videoCardMemory);
+				auto gpus = GetAvailableGPU();
+				PrintInfoGPU(gpus);
 
 
 				delete[] displayModeList;
