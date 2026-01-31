@@ -151,6 +151,7 @@
     <ClCompile Include="source\DX11\SamplerState\SamplerState.cpp" />
     <ClCompile Include="source\DX11\Texture2D\Texture2D.cpp" />
     <ClCompile Include="source\Framework\GPUInfo\GPUInfo.cpp" />
+    <ClCompile Include="source\Framework\MonitorInfo\MonitorInfo.cpp" />
     <ClCompile Include="source\LerpedValue\LerpedValue.cpp" />
     <ClCompile Include="source\PBR_TextureObject\PBR.TextureObject.cpp" />
     <ClCompile Include="source\DX11\Shader\DX11.Shader.cpp" />
@@ -174,6 +175,7 @@
     <ClInclude Include="source\DX11\Texture2D\DX11.Texture2D.h" />
     <ClInclude Include="source\DX11\Texture2D\Texture2D.h" />
     <ClInclude Include="source\Framework\GPUInfo\GPUInfo.h" />
+    <ClInclude Include="source\Framework\MonitorInfo\MonitorInfo.h" />
     <ClInclude Include="source\LerpedValue\LerpedValue.h" />
     <ClInclude Include="source\PBR_TextureObject\PBR.TextureObject.h" />
     <ClInclude Include="source\DX11\Shader\DX11.Shader.h" />

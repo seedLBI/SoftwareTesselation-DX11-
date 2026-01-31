@@ -82,12 +82,14 @@ void GSMain(point VSOutput input[1], inout TriangleStream<PSInput> triStream)
     v.color = input[0].color;
     
     // 1
-    v.pos = mul(float4(pTL, 1.0f), WorldViewProj);
-    v.uv = float2(0.0f, 0.0f);
-    triStream.Append(v);
     v.pos = mul(float4(pBL, 1.0f), WorldViewProj);
     v.uv = float2(0.0f, 1.0f);
     triStream.Append(v);
+    
+    v.pos = mul(float4(pTL, 1.0f), WorldViewProj);
+    v.uv = float2(0.0f, 0.0f);
+    triStream.Append(v);
+
     v.pos = mul(float4(pTR, 1.0f), WorldViewProj);
     v.uv = float2(1.0f, 0.0f);
     triStream.Append(v);
@@ -96,9 +98,11 @@ void GSMain(point VSOutput input[1], inout TriangleStream<PSInput> triStream)
     v.pos = mul(float4(pTR, 1.0f), WorldViewProj);
     v.uv = float2(1.0f, 0.0f);
     triStream.Append(v);
+    
     v.pos = mul(float4(pBL, 1.0f), WorldViewProj);
     v.uv = float2(0.0f, 1.0f);
     triStream.Append(v);
+    
     v.pos = mul(float4(pBR, 1.0f), WorldViewProj);
     v.uv = float2(1.0f, 1.0f);
     triStream.Append(v);

@@ -175,11 +175,11 @@ VSOutput VSMain(uint v_id : SV_VertexID, uint i_id : SV_InstanceID)
 
     geom.pos += obj_pos;
     
-    /*
-    float displacement = tex_displacement.SampleLevel(Samp, uv * 1.f,0).x;
-    displacement = displacement * 2.0 - 1.0;
-    geom.pos += geom.normal * displacement * 0.05f;
-    */    
+    
+    //float displacement = tex_displacement.SampleLevel(Samp, uv * 1.f,0).x;
+    //displacement = displacement * 2.0 - 1.0;
+    //geom.pos += geom.normal * displacement * 0.05f;
+        
     
     VSOutput O;
     O.uv        = uv * 1.f;
@@ -314,7 +314,7 @@ float4 PSMain(VSOutput IN) : SV_Target
     float3 color = PBR(IN.posWorld, normal, albedo, ao, metallic, roughness);
     
     return float4(color, opacity);
-    */
+    */    
         
     
     

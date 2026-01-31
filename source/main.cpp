@@ -13,8 +13,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, LPWSTR, int nCmdShow) {
 
 
         MSG msg;
-        while (!shouldExit && PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
-        {
+        while (!shouldExit && PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
 
             TranslateMessage(&msg);
             DispatchMessage(&msg);

@@ -20,6 +20,11 @@ namespace framework {
 			window::mScreenWidth = width;
 			window::mScreenHeight = height;
 			window::mWindowTitle = title;
+			
+			window::mWindowWidth_i = width;
+			window::mWindowHeight_i = height;
+
+			window::m_aspectRatio = float(width) / float(height);
 
 			InitWindow();
 			InitDirectX();

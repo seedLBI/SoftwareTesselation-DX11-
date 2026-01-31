@@ -11,12 +11,17 @@ struct GPUInfo {
     int index;
     std::string description;
     int dedicatedMemoryMB;
-    int systemMemoryMB;
     int vendorId;
     bool supportsDX11;
 };
 
+
 std::vector<GPUInfo> GetAvailableGPU();
+
+int GetIndexBestGPU(const std::vector<GPUInfo>& gpu_s);
+
 void PrintInfoGPU(const std::vector<GPUInfo>& info);
+
+
 
 #endif

@@ -6,7 +6,7 @@ Application::Application(HINSTANCE hInstance, int nCmdShow) {
 	framework::core::Init(hInstance, nCmdShow);
 
 	framework::time::SetFPS(0);
-	framework::directx::EnableVSync();
+	framework::directx::DisableVSync();
 
 
 
@@ -33,11 +33,11 @@ Application::Application(HINSTANCE hInstance, int nCmdShow) {
 
 	
 	std::cout << "[PBR] - Load\n";
-	//pbrData.LoadFromFolder("resources\\pbr_textures\\tile");
-	//pbrData2.LoadFromFolder("resources\\pbr_textures\\bricks");
+	pbrData.LoadFromFolder("resources\\pbr_textures\\tile");
+	pbrData2.LoadFromFolder("resources\\pbr_textures\\bricks");
 
 	std::cout << "[PBR] - Bind [bricks]\n";
-	//pbrData2.BindToAll();
+	pbrData2.BindToAll();
 	
 
 	std::cout << "[SAMPLER STATE] - Creting\n";
@@ -69,14 +69,60 @@ inline float fract(float x)
 void Application::Frame() {
 	using namespace framework::directx;
 	
+	//shader_test_ndc.Bind();
+	//quadF->Render();
+
 	
+	GetContext()->IASetInputLayout(nullptr);
+	UINT stride = 0;
+	UINT offset = 0;
+	ID3D11Buffer* nullVB[1] = { nullptr };
+	GetContext()->IASetVertexBuffers(0, 0, nullptr, &stride, &offset);
+
+	shader.Bind();
+
+	OBJECT_INFO.ao = 1.f;
+	OBJECT_INFO.albedo = { 0.5f,0.f,0.f };
+
+	const int sphereRows = 8;
+	const int sphereColumns = 8;
+	const float spacing = 2.5;
+	for (size_t y = 0; y <= sphereRows; y++) {
+
+		float metallic = (float)y / (float)sphereRows;
+		OBJECT_INFO.metallic = metallic;
 
 
+		for (size_t x = 0; x <= sphereColumns; x++) {
 
-	shader_test_ndc.Bind();
-	quadF->Render();
+			float roughness = (float)x / (float)sphereColumns;
+			if (roughness < 0.05f)
+				roughness = 0.05f;
 
 
+			OBJECT_INFO.roughness = roughness;
+
+			float mid_col = float(sphereColumns) / 2.f;
+			float mid_row = float(sphereRows) / 2.f;
+			float col = (float)x;
+			float row = (float)y;
+			OBJECT_INFO.pos = {
+				-(col - mid_col) * spacing,
+				(row - mid_row) * spacing,
+				0.f };
+
+			cbuffer_ObjectInfo->Update(OBJECT_INFO);
+
+			GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			GetContext()->DrawInstanced(6, count_quads, 0, 0);
+		}
+	}
+
+	// Light render
+	shader_billboard_light.Bind();
+	GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+	GetContext()->DrawInstanced(1, UTILS.count_lights, 0, 0);
+	
 
 }
 
@@ -138,7 +184,8 @@ void Application::Update_cMATRIX() {
 	XMStoreFloat3(&MATRIX.UpView, camera.GetUp());
 	XMStoreFloat3(&MATRIX.RightView, camera.GetRight());
 
-
+	/*
+	
 	DirectX::XMMATRIX matrix = DirectX::XMMatrixOrthographicLH(
 		1.f,
 		1.f,
@@ -147,6 +194,8 @@ void Application::Update_cMATRIX() {
 	);
 
 	XMStoreFloat4x4(&MATRIX.WorldViewProj, matrix);
+
+	*/
 }
 
 void Application::Update_cTIME() {
@@ -159,11 +208,9 @@ void Application::Update_cLIGHT() {
 	UTILS.count_lights = 4;
 
 	LIGHT.lights[0].pos = { -10.0f,  10.0f, 10.0f, 0.f };
-	LIGHT.lights[1].pos = { 10.0f,  10.0f, 10.0f, 0.f };
+	LIGHT.lights[1].pos = {  10.0f,  10.0f, 10.0f, 0.f };
 	LIGHT.lights[2].pos = { -10.0f, -10.0f, 10.0f, 0.f };
-	LIGHT.lights[3].pos = { 10.0f, -10.0f, 10.0f, 0.f };
-
-
+	LIGHT.lights[3].pos = {  10.0f, -10.0f, 10.0f, 0.f };
 
 	LIGHT.lights[0].color = { 300.0f, 300.0f, 300.0f, 0.f };
 	LIGHT.lights[1].color = { 300.0f, 300.0f, 300.0f, 0.f };
@@ -183,7 +230,7 @@ void Application::Update_cLIGHT() {
 		float len = dx * dx + dy * dy + dz * dz;
 
 		return len;
-		};
+	};
 
 	for (size_t i = 0; i < UTILS.count_lights; i++) {
 
@@ -220,6 +267,25 @@ void Application::Update() {
 	}
 	else if (IsKeyPressed(KEY_B)) {
 		pbrData2.BindToAll();
+	}
+
+	using namespace framework::directx;
+	if (IsKeyPressed(KEY_1)) {
+		SetRasterState(RasterStates::SOLID_CULL_NONE);
+	}
+	if (IsKeyPressed(KEY_2)) {
+		SetRasterState(RasterStates::SOLID_CULL_BACK);
+	}
+	if (IsKeyPressed(KEY_3)) {
+		SetRasterState(RasterStates::SOLID_CULL_FRONT);
+	}
+	if (IsKeyPressed(KEY_4)) {
+		SetRasterState(RasterStates::WIREFRAME_CULL_NONE);
+	}
+
+	using namespace framework::window;
+	if (IsKeyPressed(KEY_F11)) {
+		ToggleFullscreen();
 	}
 
 

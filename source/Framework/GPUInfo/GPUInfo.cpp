@@ -25,7 +25,7 @@ std::vector<GPUInfo> GetAvailableGPU() {
 
 
             info.dedicatedMemoryMB = (int)(desc.DedicatedVideoMemory / (1024 * 1024));
-            info.systemMemoryMB = (int)(desc.DedicatedSystemMemory / (1024 * 1024));
+
             info.vendorId = desc.VendorId;
 
             D3D_FEATURE_LEVEL featureLevels[] = { D3D_FEATURE_LEVEL_11_0 };
@@ -46,7 +46,10 @@ std::vector<GPUInfo> GetAvailableGPU() {
 
             info.supportsDX11 = SUCCEEDED(result);
 
-            gpus.push_back(info);
+            if (info.dedicatedMemoryMB != 0)
+                gpus.push_back(info);
+
+            
         }
 
         adapter->Release();
@@ -57,17 +60,141 @@ std::vector<GPUInfo> GetAvailableGPU() {
     return gpus;
 }
 
-void PrintInfoGPU(const std::vector<GPUInfo>& info) {
+int GetIndexBestGPU(const std::vector<GPUInfo>& gpu_s) {
+    if (gpu_s.empty()) {
+        return -1;
+    }
 
-    printf("=========== AVAILABLE GPUs ===========\n");
+    int bestIndex = -1;
+    float bestScore = -1.0f;
 
-    for (const GPUInfo& gpu : info) {
-        printf("%i : [%s]\n", gpu.index, gpu.description.c_str());
-        printf("\tDedicated memory: %i Mb\n", gpu.dedicatedMemoryMB);
-        printf("\t   System memory: %i Mb\n", gpu.systemMemoryMB);
-        printf("\t    Support DX11: %s\n",  (gpu.supportsDX11 >= 1 ? "True" : "False"));
-        printf("\t       Vendor id: %i\n\n", gpu.vendorId);
+    for (size_t i = 0; i < gpu_s.size(); i++) {
+        const GPUInfo& gpu = gpu_s[i];
+        float score = 0.0f;
+
+        if (gpu.supportsDX11) score += 100.0f;
+
+        float memoryScore = (std::min)(60.0f,
+            static_cast<float>(gpu.dedicatedMemoryMB) / 16384.0f * 60.0f);
+        score += memoryScore;
+
+        switch (gpu.vendorId) {
+        case 0x10DE: // NVIDIA
+            score += 30.0f;
+            if (gpu.description.find("RTX") != std::string::npos ||
+                gpu.description.find("GTX") != std::string::npos) {
+                score += 20.0f;
+            }
+            break;
+        case 0x1002: // AMD
+            score += 25.0f;
+            if (gpu.description.find("Radeon") != std::string::npos ||
+                gpu.description.find("RX") != std::string::npos) {
+                score += 15.0f;
+            }
+            break;
+        case 0x8086: // Intel
+            score += 10.0f;
+            if (gpu.description.find("Arc") != std::string::npos) {
+                score += 20.0f;
+            }
+            break;
+        default:
+            score += 5.0f;
+        }
+
+        if (gpu.dedicatedMemoryMB < 1024 ||
+            gpu.description.find("Intel") != std::string::npos ||
+            gpu.description.find("UHD") != std::string::npos ||
+            gpu.description.find("HD Graphics") != std::string::npos) {
+            score -= 50.0f;
+        }
+
+        if (score > bestScore) {
+            bestScore = score;
+            bestIndex = static_cast<int>(i);
+        }
+    }
+
+    return bestIndex;
+}
+
+
+
+#include <Windows.h>
+
+void PrintInfoGPU(const std::vector<GPUInfo>& gpus) {
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+
+    const WORD text_red = FOREGROUND_RED | FOREGROUND_INTENSITY;
+    const WORD text_green = FOREGROUND_GREEN | FOREGROUND_INTENSITY;
+    const WORD text_blue = FOREGROUND_BLUE | FOREGROUND_INTENSITY;
+    const WORD text_yellow = FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_INTENSITY;
+    const WORD text_gray = FOREGROUND_INTENSITY;
+    const WORD text_white = FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY;
+    
+
+    const WORD back_white = BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_RED | BACKGROUND_INTENSITY;
+    const WORD back_yellow = BACKGROUND_GREEN | BACKGROUND_RED | BACKGROUND_INTENSITY;
+
+    SetConsoleTextAttribute(hConsole, back_white);
+
+
+    const int width_box = 66;
+
+    printf("%*s\n", width_box, "");
+    printf("%*s->[", width_box/2 - 3 - 15/2,"");
+    SetConsoleTextAttribute(hConsole, text_red | back_white);
+    printf("AVAILABLE GPUs");
+    SetConsoleTextAttribute(hConsole, back_white);
+    printf("]<-%*s\n", width_box / 2 - 3 - 15 / 2,"");
+    printf("%*s\n", width_box, "");
+    SetConsoleTextAttribute(hConsole, text_white);
+
+
+    int index_best = GetIndexBestGPU(gpus);
+
+
+
+    for (const GPUInfo& gpu : gpus) {
+
+        printf("\n%i: ", gpu.index);
+
+        if (index_best == gpu.index) {
+            SetConsoleTextAttribute(hConsole, back_yellow);
+            printf("[%s]", gpu.description.c_str());
+
+            SetConsoleTextAttribute(hConsole, text_yellow);
+            printf(" [BEST]\n");
+        }
+        else {
+            SetConsoleTextAttribute(hConsole, text_white);
+            printf("[%s]\n", gpu.description.c_str());
+        }
+
+
+
+        SetConsoleTextAttribute(hConsole, text_gray);
+        std::cout << "\t    Support DX11: ";
+
+        if (gpu.supportsDX11)
+            SetConsoleTextAttribute(hConsole, text_green);
+        else
+            SetConsoleTextAttribute(hConsole, text_red);
+        printf("%s\n", (gpu.supportsDX11 >= 1 ? "True" : "False"));
+
+        SetConsoleTextAttribute(hConsole, text_gray);
+        std::cout << "\tDedicated memory: ";
+        SetConsoleTextAttribute(hConsole, text_white);
+        printf("%i Mb\n", gpu.dedicatedMemoryMB);
+
+
+        SetConsoleTextAttribute(hConsole, text_gray);
+        std::cout << "\t       Vendor id: ";
+        SetConsoleTextAttribute(hConsole, text_white);
+        printf("%i\n", gpu.vendorId);
 
     }
+    printf("===================================================\n\n");
 
 }

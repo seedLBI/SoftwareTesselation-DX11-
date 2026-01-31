@@ -12,6 +12,7 @@
 #include "Enums/Mouse.Enums.h"
 
 #include "GPUInfo/GPUInfo.h"
+#include "MonitorInfo/MonitorInfo.h"
 
 #include <windows.h>
 #include <string>
@@ -37,36 +38,59 @@ namespace framework {
 
 
 			namespace window {
-				extern HINSTANCE mInstance;
+				extern HINSTANCE	mInstance;
 				extern std::wstring mWindowClass;
 				extern std::wstring mWindowTitle;
-				extern int mShowCommand;
-				extern HWND mWindowHandle;
-				extern WNDCLASSEX mWindow;
-				extern UINT mScreenWidth;
-				extern UINT mScreenHeight;
-				extern bool mConsoleDraw;
-				extern bool mCursorVisible;
-				extern bool mClipCursor;
+				extern int			mShowCommand;
+				extern HWND			mWindowHandle;
+				extern WNDCLASSEX	mWindow;
+				extern UINT			mScreenWidth;
+				extern UINT			mScreenHeight;
+				extern bool			mConsoleDraw;
+				extern bool			mCursorVisible;
+				extern bool			mClipCursor;
+
+				extern int			mWindowWidth_i;
+				extern int			mWindowHeight_i;
+
+				extern float		m_aspectRatio;
+
+				extern bool			isFullscreen;
+				extern int			windowedWidth;
+				extern int			windowedHeight;
+				extern int			windowedPosX;
+				extern int			windowedPosY;
+
 			}
 			void InitWindow();
 			void TerminateWindow();
 
 
 			namespace directx {
-				extern int m_videoCardMemory;
-				extern char m_videoCardDescription[128];
-				extern IDXGISwapChain* m_swapChain;
-				extern ID3D11Device* m_device;
-				extern ID3D11DeviceContext* m_deviceContext;
-				extern ID3D11RenderTargetView* m_renderTargetView;
-				extern ID3D11Texture2D* m_depthStencilBuffer;
+				extern IDXGISwapChain*			m_swapChain;
+				extern ID3D11Device*			m_device;
+				extern ID3D11DeviceContext*		m_deviceContext;
+				extern ID3D11RenderTargetView*	m_renderTargetView;
+				extern ID3D11Texture2D*			m_depthStencilBuffer;
 				extern ID3D11DepthStencilState* m_depthStencilState;
-				extern ID3D11DepthStencilView* m_depthStencilView;
-				extern ID3D11RasterizerState* m_rasterState;
-				extern D3D11_VIEWPORT m_viewport;
+				extern ID3D11DepthStencilView*	m_depthStencilView;
+				extern D3D11_VIEWPORT			m_viewport;
 
-				extern bool isVSyncEnabled;
+				extern bool						isVSyncEnabled;
+
+				extern std::array<ID3D11RasterizerState*, 4> raster_states;
+				extern std::array< std::array<ID3D11BlendState*, 5>, 3> blend_states;
+				void InitRasterStates();
+				void InitBlendStates();
+
+				void CreateRenderTarget();
+				void CreateDepthStencil(int width, int height);
+
+
+
+
+
+				void OnResize(int width, int height);
 			}
 			void InitDirectX();
 			void TerminateDirectX();
@@ -112,7 +136,7 @@ namespace framework {
 			const std::wstring& title = L"DirectX app",
 			const int& width = 1920,
 			const int& height = 1000
-			);
+		);
 
 		void Terminate();
 
@@ -141,6 +165,8 @@ namespace framework {
 		void			SetPosition(const int& x, const int& y);
 		void			SetPosition(const DirectX::XMINT2& pos);
 
+		float			GetAspectRatio();
+
 		DirectX::XMINT2 GetSize();
 		void			SetSize(const int& width, const int& height);
 		void			SetSize(const DirectX::XMINT2& size);
@@ -164,6 +190,9 @@ namespace framework {
 		void			Hide();
 		void			Restore();
 
+		void			ToggleFullscreen();
+		void			SetFullscreen(bool fullscreen);
+		bool			IsFullscreen();
 	}
 
 	namespace directx {
@@ -175,9 +204,31 @@ namespace framework {
 		void BeginScene(const DirectX::XMFLOAT4& color);
 		void EndScene();
 
+
+		enum RasterStates {
+			SOLID_CULL_BACK,
+			SOLID_CULL_FRONT,
+			SOLID_CULL_NONE,
+			WIREFRAME_CULL_NONE,
+		};
+		void SetRasterState(const RasterStates& state);
+
+		enum BlendStates {
+			OFF,
+			ON,
+			ALPHA
+		};
+		enum BlendOp {
+			ADD,
+			SUB,
+			REVSUB,
+			MIN,
+			MAX
+		};
+		void SetBlendState(const BlendStates& state, const BlendOp& op);
+
 		void SetBackBufferRenderTarget();
 		void ResetViewport();
-
 
 		void EnableVSync();
 		void DisableVSync();
@@ -198,12 +249,10 @@ namespace framework {
 		bool IsMousePressed (const MouseButton& button);
 		bool IsMouseReleased(const MouseButton& button);
 
-
 		DirectX::XMINT2 GetPositionClient();
 		DirectX::XMINT2 GetPositionScreen();
 		DirectX::XMINT2 GetDelta();
 		int				GetWheelDelta();
-
 
 	}
 

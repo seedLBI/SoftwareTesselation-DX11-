@@ -13,7 +13,7 @@ PBR_TextureObject::~PBR_TextureObject() {
 void PBR_TextureObject::LoadFromFolder(const std::string& path) {
 
 	std::filesystem::path fs_path(path);
-	std::cout << "[PBR][" << fs_path.filename().string() << "]\n";
+	std::cout << "[PBR][" << fs_path.filename().string() << "]---------------\n";
 
 	for (const auto& entry : std::filesystem::recursive_directory_iterator(fs_path)) {
 
@@ -23,37 +23,36 @@ void PBR_TextureObject::LoadFromFolder(const std::string& path) {
 		std::string name = entry.path().stem().generic_string();
 
 
-
 		if (name == "albedo") {
-			std::cout << "\t[ALBEDO]\n";
+			std::cout << "\t[ALBEDO]       ";
 			meterials.albedo.LoadTextureFromFile(path2file);
 		}
 		else if (name == "ao") {
-			std::cout << "\t[AO]\n";
+			std::cout << "\t[AO]           ";
 			meterials.ao.LoadTextureFromFile(path2file);
 		}
 		else if (name == "displacement") {
-			std::cout << "\t[DISPLACEMENT]\n";
+			std::cout << "\t[DISPLACEMENT] ";
 
 			meterials.displacement.LoadTextureFromFile(path2file);
 		}
 		else if (name == "metallic") {
-			std::cout << "\t[METALLIC]\n";
+			std::cout << "\t[METALLIC]     ";
 
 			meterials.metallic.LoadTextureFromFile(path2file);
 		}
 		else if (name == "normal") {
-			std::cout << "\t[NORMAL]\n";
+			std::cout << "\t[NORMAL]       ";
 
 			meterials.normal.LoadTextureFromFile(path2file);
 		}
 		else if (name == "opacity") {
-			std::cout << "\t[OPACITY]\n";
+			std::cout << "\t[OPACITY]      ";
 
 			meterials.opacity.LoadTextureFromFile(path2file);
 		}
 		else if (name == "roughness") {
-			std::cout << "\t[ROUGHNESS]\n";
+			std::cout << "\t[ROUGHNESS]    ";
 
 			meterials.roughness.LoadTextureFromFile(path2file);
 		}
